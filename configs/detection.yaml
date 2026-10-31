@@ -1,0 +1,20 @@
+# Player and ball detection settings (pretrained COCO YOLO for now).
+
+model:
+  path: yolov8m.pt          # downloaded automatically by ultralytics on first run
+  device: auto              # auto | cpu | cuda:0
+  image_size: 1280          # larger input helps with the small ball
+
+classes:                    # COCO class ids
+  person: 0
+  ball: 32                  # "sports ball"
+
+# Ultralytics runs with min(player_conf, ball_conf); detection.py then
+# filters each class with its own threshold.
+thresholds:
+  player_conf: 0.35
+  ball_conf: 0.10           # low on purpose: the ball is small and often blurred
+  nms_iou: 0.50
+
+output:
+  filename_pattern: "detections_{camera_id}.json"

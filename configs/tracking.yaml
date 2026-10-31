@@ -1,0 +1,3 @@
+# Ultralytics ships this tracker configuration with the package.
+# Copy and customise it later only if the default loses IDs too often.
+tracker: bytetrack.yaml

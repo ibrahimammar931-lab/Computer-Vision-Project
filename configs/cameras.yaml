@@ -1,0 +1,10 @@
+# One entry per camera. For now: a single internet match clip.
+# `file` is relative to data/raw_videos/<scenario>/
+
+cameras:
+  cam_01:
+    file: cam_01.mp4
+  # cam_02:
+  #   file: cam_02.mp4
+  # cam_03:
+  #   file: cam_03.mp4

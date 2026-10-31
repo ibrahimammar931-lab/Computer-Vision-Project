@@ -5,6 +5,7 @@ from typing import Any
 from src.config import load_configs, resolve_project_path
 from src.detection import detect_video, load_model, save_detections
 from src.team_classification import smooth_team_labels
+from src.tracking import save_tracks, track_video
 from src.utils.io import load_json
 
 
@@ -84,3 +85,41 @@ def run_teams(
     smooth_team_labels(data, color_ranges=color_ranges, video_path=video, output_path=destination)
     print(f"Saved team labels: {destination}")
     return str(destination)
+
+
+def run_tracking(
+    *,
+    camera_id: str = "cam_01",
+    video_path: str | Path | None = None,
+    output_path: str | Path | None = None,
+    config_dir: str | Path | None = None,
+    model_path: str | None = None,
+    device: str | None = None,
+) -> str:
+    """Run YOLO detection with ByteTrack and save a JSON track file."""
+    configs = load_configs(config_dir)
+    project = configs["project"]
+    detection = configs["detection"]
+    tracking = configs.get("tracking", {})
+    camera = _camera_settings(configs["cameras"], camera_id)
+    video = _required_video_path(camera, video_path)
+    weights = model_path or detection.get("model_path", "yolov8n.pt")
+    selected_device = device or detection.get("device")
+    model = load_model(str(weights), device=selected_device)
+    result = track_video(
+        model,
+        video,
+        camera_id=camera_id,
+        player_conf=float(detection.get("player_confidence", detection.get("player_conf", 0.25))),
+        ball_conf=float(detection.get("ball_confidence", detection.get("ball_conf", 0.10))),
+        player_class_id=int(detection.get("player_class_id", 0)),
+        ball_class_id=int(detection.get("ball_class_id", 32)),
+        imgsz=int(detection.get("imgsz", 960)),
+        tracker=str(tracking.get("tracker", "bytetrack.yaml")),
+        device=selected_device,
+    )
+    default_output = project.get("tracking_output", f"outputs/tracking/tracks_{camera_id}.json")
+    destination = resolve_project_path(output_path or default_output)
+    saved = save_tracks(result, destination)
+    print(f"Saved tracks: {saved}")
+    return saved

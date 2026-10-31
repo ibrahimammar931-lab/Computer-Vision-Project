@@ -21,13 +21,13 @@ def _read_yaml(path: Path) -> dict[str, Any]:
 
 
 def load_configs(config_dir: str | Path | None = None) -> dict[str, dict[str, Any]]:
-    """Load project, detection, and camera settings; empty YAML files become {}."""
+    """Load pipeline settings; empty YAML files become empty mappings."""
     root = Path(config_dir) if config_dir is not None else CONFIG_DIR
     if not root.is_absolute():
         root = PROJECT_ROOT / root
     return {
         name: _read_yaml(root / f"{name}.yaml")
-        for name in ("project", "detection", "cameras")
+        for name in ("project", "detection", "cameras", "tracking")
     }
 
 

@@ -1,0 +1,42 @@
+project:
+  name: offside-detection
+  scenario: scenario_001    # folder name under data/raw_videos/
+
+paths:
+  raw_videos: data/raw_videos
+  calibration_frames: data/calibration_frames
+  annotations_manual: data/annotations_manual
+  outputs: outputs
+
+team_classification:
+  # Torso crop inside the player box, as fractions of box width / height
+  jersey_crop:
+    top: 0.15
+    bottom: 0.55
+    left: 0.25
+    right: 0.75
+  min_match_ratio: 0.15     # min fraction of crop pixels that must fall inside a class HSV range
+  unknown_label: unknown
+  unknown_draw_color_bgr: [128, 128, 128]
+
+  # OpenCV HSV scale: H 0-179, S 0-255, V 0-255.
+  # PLACEHOLDER VALUES: retune for every match / kit combination.
+  # Each class can have several ranges (red wraps around H=0, hence two ranges).
+  classes:
+    team_a:
+      draw_color_bgr: [0, 0, 255]
+      hsv_ranges:
+        - [[0, 100, 70], [10, 255, 255]]
+        - [[170, 100, 70], [179, 255, 255]]
+    team_b:
+      draw_color_bgr: [255, 0, 0]
+      hsv_ranges:
+        - [[100, 100, 50], [130, 255, 255]]
+    goalkeeper:
+      draw_color_bgr: [0, 255, 255]
+      hsv_ranges:
+        - [[20, 100, 100], [35, 255, 255]]
+    referee:
+      draw_color_bgr: [255, 255, 255]
+      hsv_ranges:
+        - [[0, 0, 0], [179, 255, 50]]
